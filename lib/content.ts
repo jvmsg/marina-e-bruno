@@ -29,8 +29,8 @@ export const weddingContent = {
     { time: "19h00", title: "Jantar e festa", description: "Música, dança e muita alegria." },
   ],
   photos: {
-    hero: "hero/cover.jpg",
-    gallery: ["gallery/photo-1.jpg", "gallery/photo-2.jpg"],
+    hero: "gallery/Bruno & Marina - Pre Wedding-110.jpg",
+    gallery: ["gallery/Bruno & Marina - Pre Wedding-110.jpg", "gallery/Bruno & Marina - Pre Wedding-116.jpg"],
   },
   messages: {
     phoneNotFound:
