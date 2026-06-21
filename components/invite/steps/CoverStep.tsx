@@ -1,29 +1,39 @@
 import { weddingContent } from "@/lib/content";
-import { StorageImage } from "@/components/ui/StorageImage";
+import { Separator } from "@/components/ui/separator";
+import {
+  StaggerChildren,
+  StaggerItem,
+} from "@/components/motion/stagger-children";
 
 export function CoverStep() {
   return (
-    <div className="flex h-full flex-col items-center text-center">
-      <div className="relative mb-6 h-52 w-full overflow-hidden rounded-2xl sm:h-64">
-        <StorageImage
-          path={weddingContent.photos.hero}
-          alt="Foto do casal"
-          fill
-          priority
-        />
-      </div>
-      <p className="mb-2 text-sm uppercase tracking-[0.35em] text-[color:var(--accent-women)]">
-        Você está convidado
-      </p>
-      <h1 className="font-serif text-4xl text-[color:var(--accent-men)] sm:text-5xl">
-        {weddingContent.couple.fullNames}
-      </h1>
-      <p className="mt-4 text-lg text-[color:var(--accent-men)]/80">
-        {weddingContent.date.weekday}, {weddingContent.date.display}
-      </p>
-      <p className="mt-2 text-sm text-[color:var(--accent-men)]/70">
-        {weddingContent.venue.name}
-      </p>
-    </div>
+    <StaggerChildren
+      stepKey="cover"
+      className="flex invite-page-height flex-col items-center justify-center text-center"
+    >
+      <StaggerItem>
+        <p className="mb-3 text-xs uppercase tracking-[0.22em] text-accent sm:text-sm sm:tracking-[0.35em]">
+          Você está convidado
+        </p>
+      </StaggerItem>
+      <StaggerItem>
+        <h1 className="font-serif text-[clamp(1.85rem,8vw,3rem)] leading-tight text-foreground">
+          {weddingContent.couple.fullNames}
+        </h1>
+      </StaggerItem>
+      <StaggerItem className="w-full">
+        <Separator className="mx-auto mt-5 w-16 bg-border" />
+      </StaggerItem>
+      <StaggerItem>
+        <p className="mt-5 text-base text-foreground/85 sm:text-lg">
+          {weddingContent.date.weekday}, {weddingContent.date.display}
+        </p>
+      </StaggerItem>
+      <StaggerItem>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {weddingContent.venue.name}
+        </p>
+      </StaggerItem>
+    </StaggerChildren>
   );
 }

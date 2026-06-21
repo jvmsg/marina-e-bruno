@@ -1,7 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans, Playfair_Display } from "next/font/google";
 import { weddingContent } from "@/lib/content";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#f0e9dc",
+};
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -24,8 +32,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${dmSans.variable} ${playfair.variable} h-full antialiased`}>
-      <body className="min-h-full">{children}</body>
+    <html
+      lang="pt-BR"
+      className={cn("h-full antialiased", dmSans.variable, playfair.variable)}
+    >
+      <body className="min-h-full font-sans">{children}</body>
     </html>
   );
 }

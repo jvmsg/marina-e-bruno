@@ -14,10 +14,10 @@ export function StepProgress({ currentStep, totalSteps }: StepProgressProps) {
           className={cn(
             "h-2.5 rounded-full transition-all duration-300",
             index === currentStep
-              ? "w-8 bg-[color:var(--accent-men)]"
+              ? "w-8 bg-primary"
               : index < currentStep
-                ? "w-2.5 bg-[color:var(--accent-women)]"
-                : "w-2.5 bg-[color:var(--bg-taupe)]",
+                ? "w-2.5 bg-accent"
+                : "w-2.5 bg-border",
           )}
           aria-hidden
         />

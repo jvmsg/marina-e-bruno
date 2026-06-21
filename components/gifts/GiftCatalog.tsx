@@ -3,8 +3,12 @@
 import { useState } from "react";
 import { loadRsvpSession } from "@/lib/rsvp-session";
 import type { GiftItem } from "@/lib/types";
-import { formatCurrency } from "@/lib/utils";
-import { StorageImage } from "@/components/ui/StorageImage";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card";
+import { GiftCard } from "@/components/gifts/gift-card";
 
 interface GiftCatalogProps {
   items: GiftItem[];
@@ -48,56 +52,31 @@ export function GiftCatalog({ items }: GiftCatalogProps) {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-[color:var(--bg-taupe)] bg-[color:var(--bg-sand)] p-6 text-center text-[color:var(--accent-men)]/80">
-        Em breve disponibilizaremos os presentes aqui.
-      </div>
+      <Card className="rounded-2xl py-6 text-center">
+        <CardContent>
+          <p className="text-muted-foreground">
+            Em breve disponibilizaremos os presentes aqui.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <div className="space-y-4">
       {error && (
-        <p className="rounded-2xl bg-[color:var(--accent-women)]/10 px-4 py-3 text-sm text-[color:var(--accent-women)]">
-          {error}
-        </p>
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
 
       {items.map((item) => (
-        <article
+        <GiftCard
           key={item.id}
-          className="overflow-hidden rounded-[24px] border border-[color:var(--bg-taupe)] bg-[color:var(--bg-cream)] shadow-sm"
-        >
-          {item.image_path && (
-            <div className="relative h-44 w-full">
-              <StorageImage path={item.image_path} alt={item.name} fill />
-            </div>
-          )}
-
-          <div className="p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="font-serif text-2xl text-[color:var(--accent-men)]">
-                  {item.name}
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-[color:var(--accent-men)]/75">
-                  {item.description}
-                </p>
-              </div>
-              <p className="whitespace-nowrap font-medium text-[color:var(--accent-women)]">
-                {formatCurrency(item.price_cents)}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => handleCheckout(item)}
-              disabled={loadingId === item.id}
-              className="mt-5 w-full rounded-full bg-[color:var(--accent-men)] px-4 py-3 text-sm font-medium text-[color:var(--bg-cream)] disabled:opacity-50"
-            >
-              {loadingId === item.id ? "Redirecionando..." : "Presentear"}
-            </button>
-          </div>
-        </article>
+          item={item}
+          loading={loadingId === item.id}
+          onCheckout={handleCheckout}
+        />
       ))}
     </div>
   );

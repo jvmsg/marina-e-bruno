@@ -1,133 +1,190 @@
-"use client";
-
-import { useMemo, useState } from "react";
-import { weddingContent } from "@/lib/content";
-import { saveRsvpSession } from "@/lib/rsvp-session";
-import type { Guest, GuestLookupResponse } from "@/lib/types";
-import { PaperCard } from "@/components/invite/PaperCard";
-import { StepProgress } from "@/components/invite/StepProgress";
-import { CoverStep } from "@/components/invite/steps/CoverStep";
-import { StoryStep } from "@/components/invite/steps/StoryStep";
-import { DetailsStep } from "@/components/invite/steps/DetailsStep";
-import { ScheduleStep } from "@/components/invite/steps/ScheduleStep";
-import { ConfirmationStep } from "@/components/invite/steps/ConfirmationStep";
-import { FamilyRsvpDialog } from "@/components/rsvp/FamilyRsvpDialog";
-
-const TOTAL_STEPS = 5;
-
-export function InviteStepper() {
-  const [step, setStep] = useState(0);
-  const [phone, setPhone] = useState("");
-  const [lookupLoading, setLookupLoading] = useState(false);
-  const [lookupError, setLookupError] = useState<string | null>(null);
-  const [lookupData, setLookupData] = useState<GuestLookupResponse | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-
-  const isLastStep = step === TOTAL_STEPS - 1;
-
-  const stepLabels = useMemo(
-    () => ["Capa", "História", "Detalhes", "Programação", "Confirmação"],
-    [],
-  );
-
-  async function handleLookup() {
-    setLookupLoading(true);
-    setLookupError(null);
-
-    try {
-      const response = await fetch("/api/guests/lookup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
-      });
-
-      const data = (await response.json()) as GuestLookupResponse & { error?: string };
-
-      if (!response.ok) {
-        if (data.error === "not_found") {
-          setLookupError(weddingContent.messages.phoneNotFound);
-        } else {
-          setLookupError(data.error ?? weddingContent.messages.phoneNotFound);
-        }
-        return;
-      }
-
-      setLookupData(data);
-      setDialogOpen(true);
-    } catch {
-      setLookupError("Não foi possível buscar o convite. Tente novamente.");
-    } finally {
-      setLookupLoading(false);
-    }
-  }
-
-  function handleRsvpComplete(primaryGuest: Guest) {
-    saveRsvpSession({
-      familyId: lookupData?.family.id ?? primaryGuest.family_id,
-      guestId: primaryGuest.id,
-    });
-    setDialogOpen(false);
-  }
-
-  return (
-    <>
-      <section className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-4 py-8 sm:py-12">
-        <div className="mb-6 text-center">
-          <StepProgress currentStep={step} totalSteps={TOTAL_STEPS} />
-          <p className="mt-3 text-xs uppercase tracking-[0.25em] text-[color:var(--accent-men)]/60">
-            {stepLabels[step]}
-          </p>
-        </div>
-
-        <PaperCard className="min-h-[560px] flex-1">
-          <div className="relative z-10 flex h-full min-h-[480px] flex-col">
-            {step === 0 && <CoverStep />}
-            {step === 1 && <StoryStep />}
-            {step === 2 && <DetailsStep />}
-            {step === 3 && <ScheduleStep />}
-            {step === 4 && (
-              <ConfirmationStep
-                phone={phone}
-                onPhoneChange={setPhone}
-                onSubmit={handleLookup}
-                loading={lookupLoading}
-                error={lookupError}
-              />
-            )}
-          </div>
-        </PaperCard>
-
-        {!isLastStep && (
-          <div className="mt-6 flex items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={() => setStep((current) => Math.max(current - 1, 0))}
-              disabled={step === 0}
-              className="rounded-full border border-[color:var(--bg-taupe)] px-5 py-3 text-sm font-medium text-[color:var(--accent-men)] disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Voltar
-            </button>
-            <button
-              type="button"
-              onClick={() => setStep((current) => Math.min(current + 1, TOTAL_STEPS - 1))}
-              className="rounded-full bg-[color:var(--accent-women)] px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
-            >
-              Próximo
-            </button>
-          </div>
-        )}
-      </section>
-
-      {lookupData && (
-        <FamilyRsvpDialog
-          key={lookupData.family.id}
-          open={dialogOpen}
-          onClose={() => setDialogOpen(false)}
-          family={lookupData.family}
-          guests={lookupData.guests}
-          onComplete={handleRsvpComplete}
-        />
-      )}
-    </>
-  );
-}
+"use client";
+
+import { useCallback, useMemo, useState } from "react";
+import { weddingContent } from "@/lib/content";
+import { useBookNavigation } from "@/hooks/use-book-navigation";
+import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
+import { saveRsvpSession } from "@/lib/rsvp-session";
+import type { Guest, GuestLookupResponse } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { BookPageTurn } from "@/components/motion/book-page-turn";
+import { CoverStep } from "@/components/invite/steps/CoverStep";
+import { StoryStep } from "@/components/invite/steps/StoryStep";
+import { DetailsStep } from "@/components/invite/steps/DetailsStep";
+import { ScheduleStep } from "@/components/invite/steps/ScheduleStep";
+import { ConfirmationStep } from "@/components/invite/steps/ConfirmationStep";
+import { StepProgress } from "@/components/invite/StepProgress";
+import { FamilyRsvpDialog } from "@/components/rsvp/FamilyRsvpDialog";
+import { MobileShell } from "@/components/wedding/mobile-shell";
+import { PaperCard } from "@/components/wedding/paper-card";
+import { WeddingButton } from "@/components/wedding/wedding-button";
+
+const TOTAL_STEPS = 5;
+
+export function InviteStepper() {
+  const [step, setStep] = useState(0);
+  const [phone, setPhone] = useState("");
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [lookupError, setLookupError] = useState<string | null>(null);
+  const [lookupData, setLookupData] = useState<GuestLookupResponse | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const {
+    isAnimating,
+    direction,
+    fromStep,
+    toStep,
+    goToStep,
+    finishFlip,
+  } = useBookNavigation(step, setStep);
+
+  const isLastStep = step === TOTAL_STEPS - 1;
+
+  const stepLabels = useMemo(
+    () => ["Capa", "História", "Detalhes", "Programação", "Confirmação"],
+    [],
+  );
+
+  const handleLookup = useCallback(async () => {
+    setLookupLoading(true);
+    setLookupError(null);
+
+    try {
+      const response = await fetch("/api/guests/lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+      });
+
+      const data = (await response.json()) as GuestLookupResponse & {
+        error?: string;
+      };
+
+      if (!response.ok) {
+        if (data.error === "not_found") {
+          setLookupError(weddingContent.messages.phoneNotFound);
+        } else {
+          setLookupError(data.error ?? weddingContent.messages.phoneNotFound);
+        }
+        return;
+      }
+
+      setLookupData(data);
+      setDialogOpen(true);
+    } catch {
+      setLookupError("Não foi possível buscar o convite. Tente novamente.");
+    } finally {
+      setLookupLoading(false);
+    }
+  }, [phone]);
+
+  function handleRsvpComplete(primaryGuest: Guest) {
+    saveRsvpSession({
+      familyId: lookupData?.family.id ?? primaryGuest.family_id,
+      guestId: primaryGuest.id,
+    });
+    setDialogOpen(false);
+  }
+
+  const renderStep = useCallback(
+    (currentStep: number) => {
+      switch (currentStep) {
+        case 0:
+          return <CoverStep />;
+        case 1:
+          return <StoryStep />;
+        case 2:
+          return <DetailsStep />;
+        case 3:
+          return <ScheduleStep />;
+        case 4:
+          return (
+            <ConfirmationStep
+              phone={phone}
+              onPhoneChange={setPhone}
+              onSubmit={handleLookup}
+              loading={lookupLoading}
+              error={lookupError}
+            />
+          );
+        default:
+          return null;
+      }
+    },
+    [handleLookup, lookupError, lookupLoading, phone],
+  );
+
+  const swipeHandlers = useSwipeNavigation({
+    enabled: !isAnimating && !isLastStep && !dialogOpen,
+    onSwipeLeft: () => goToStep(Math.min(step + 1, TOTAL_STEPS - 1)),
+    onSwipeRight: () => goToStep(Math.max(step - 1, 0)),
+  });
+
+  return (
+    <>
+      <MobileShell className="pb-28 sm:pb-12">
+        <div className="mb-4 text-center sm:mb-6">
+          <StepProgress currentStep={step} totalSteps={TOTAL_STEPS} />
+          <p className="mt-3 text-xs uppercase tracking-[0.2em] text-muted-foreground sm:tracking-[0.25em]">
+            {stepLabels[step]}
+          </p>
+        </div>
+
+        <PaperCard
+          className={cn(isAnimating && "overflow-visible")}
+          sheen={step !== 0 && !isAnimating}
+        >
+          <div {...swipeHandlers} className="touch-pan-y">
+            <BookPageTurn
+              step={step}
+              isAnimating={isAnimating}
+              direction={direction}
+              fromStep={fromStep}
+              toStep={toStep}
+              onFlipComplete={finishFlip}
+              renderStep={renderStep}
+            />
+          </div>
+        </PaperCard>
+
+        {!isLastStep && (
+          <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-border/80 bg-background/95 px-4 py-3 backdrop-blur-sm sm:static sm:mt-6 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+            <div className="mx-auto flex w-full max-w-lg items-center justify-between gap-3">
+              <WeddingButton
+                type="button"
+                variant="outline"
+                onClick={() => goToStep(Math.max(step - 1, 0))}
+                disabled={step === 0 || isAnimating}
+                className="flex-1 sm:flex-none"
+              >
+                Voltar
+              </WeddingButton>
+              <WeddingButton
+                type="button"
+                variant="accent"
+                onClick={() => goToStep(Math.min(step + 1, TOTAL_STEPS - 1))}
+                disabled={isAnimating}
+                className="flex-1 sm:flex-none"
+              >
+                Próximo
+              </WeddingButton>
+            </div>
+          </div>
+        )}
+      </MobileShell>
+
+      {lookupData && (
+        <FamilyRsvpDialog
+          key={lookupData.family.id}
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          onClose={() => setDialogOpen(false)}
+          family={lookupData.family}
+          guests={lookupData.guests}
+          onComplete={handleRsvpComplete}
+        />
+      )}
+    </>
+  );
+}
+
