@@ -32,7 +32,7 @@ export function ConfirmationStep({
   return (
     <StaggerChildren
       stepKey="confirmation"
-      className="flex invite-page-height flex-col gap-6"
+      className="flex h-full min-h-0 flex-col gap-6 overflow-y-auto px-5 py-4"
     >
       <StaggerItem>
         <InviteHeading

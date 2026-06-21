@@ -8,7 +8,7 @@ import {
 
 export function StoryStep() {
   return (
-    <StaggerChildren stepKey="story" className="flex invite-page-height flex-col gap-5">
+    <StaggerChildren stepKey="story" className="flex h-full min-h-0 flex-col gap-5 overflow-y-auto px-5 py-4">
       <StaggerItem>
         <InviteHeading
           eyebrow="Capítulo especial"

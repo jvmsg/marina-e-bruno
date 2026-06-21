@@ -9,7 +9,7 @@ export function CoverStep() {
   return (
     <StaggerChildren
       stepKey="cover"
-      className="flex invite-page-height flex-col items-center justify-center text-center"
+      className="flex h-full min-h-0 flex-col items-center justify-center overflow-y-auto px-5 py-4 text-center"
     >
       <StaggerItem>
         <p className="mb-3 text-xs uppercase tracking-[0.22em] text-accent sm:text-sm sm:tracking-[0.35em]">

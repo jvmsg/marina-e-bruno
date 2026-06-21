@@ -38,18 +38,20 @@ export function BookPageTurn({
 
   return (
     <div
-      className={cn("book-viewport invite-page-height relative", className)}
+      className={cn("book-viewport invite-page-height relative min-h-0", className)}
       style={{ perspective: 2200 }}
     >
       {!isAnimating ? (
-        <div className="book-page-static invite-page-height">{renderStep(step)}</div>
+        <div className="book-page-static invite-page-height h-full min-h-0">
+          {renderStep(step)}
+        </div>
       ) : (
         <>
-          <div className="book-page-under invite-page-height absolute inset-0 z-[1]">
+          <div className="book-page-under invite-page-height absolute inset-0 z-[1] h-full min-h-0">
             {renderStep(underStep)}
           </div>
           <motion.div
-            className="book-page-flip invite-page-height absolute inset-0 z-[2]"
+            className="book-page-flip invite-page-height absolute inset-0 z-[2] h-full min-h-0"
             style={{
               transformOrigin: "left center",
               transformStyle: "preserve-3d",
@@ -60,7 +62,7 @@ export function BookPageTurn({
             onAnimationComplete={onFlipComplete}
           >
             <div
-              className="book-page-face absolute inset-0 overflow-hidden bg-card"
+              className="book-page-face absolute inset-0 h-full overflow-hidden overflow-y-auto bg-card"
               style={{
                 backfaceVisibility: "hidden",
                 WebkitBackfaceVisibility: "hidden",

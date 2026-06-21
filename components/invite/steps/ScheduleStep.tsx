@@ -7,7 +7,7 @@ import {
 
 export function ScheduleStep() {
   return (
-    <StaggerChildren stepKey="schedule" className="flex invite-page-height flex-col gap-6">
+    <StaggerChildren stepKey="schedule" className="flex h-full min-h-0 flex-col gap-6 overflow-y-auto px-5 py-4">
       <StaggerItem>
         <InviteHeading eyebrow="Programação" title="Como será o dia" />
       </StaggerItem>
