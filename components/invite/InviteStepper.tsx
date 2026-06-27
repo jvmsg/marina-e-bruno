@@ -3,6 +3,7 @@
 import { useCallback, useState } from "react";
 import { weddingContent } from "@/lib/content";
 import { useBookNavigation } from "@/hooks/use-book-navigation";
+import { useInviteStepHistory } from "@/hooks/use-invite-step-history";
 import { useSwipeNavigation } from "@/hooks/use-swipe-navigation";
 import { saveRsvpSession } from "@/lib/rsvp-session";
 import type { Guest, GuestLookupResponse } from "@/lib/types";
@@ -37,7 +38,9 @@ export function InviteStepper() {
     finishFlip,
   } = useBookNavigation(step, setStep);
 
-  const isLastStep = step === TOTAL_STEPS - 1;
+  const { navigateToStep } = useInviteStepHistory(step, goToStep, {
+    enabled: !dialogOpen,
+  });
 
   const handleLookup = useCallback(async () => {
     setLookupLoading(true);
@@ -109,9 +112,17 @@ export function InviteStepper() {
   );
 
   const swipeHandlers = useSwipeNavigation({
-    enabled: !isAnimating && !isLastStep && !dialogOpen,
-    onSwipeLeft: () => goToStep(Math.min(step + 1, TOTAL_STEPS - 1)),
-    onSwipeRight: () => goToStep(Math.max(step - 1, 0)),
+    enabled: !isAnimating && !dialogOpen,
+    onSwipeLeft: () => {
+      if (step < TOTAL_STEPS - 1) {
+        navigateToStep(step + 1);
+      }
+    },
+    onSwipeRight: () => {
+      if (step > 0) {
+        navigateToStep(step - 1);
+      }
+    },
   });
 
   return (
@@ -124,10 +135,7 @@ export function InviteStepper() {
         >
           <div
             {...swipeHandlers}
-            className={cn(
-              "touch-pan-y flex min-h-0 flex-1 flex-col pt-[max(0.75rem,env(safe-area-inset-top))] sm:pt-0",
-              !isLastStep && "pb-14 sm:pb-16",
-            )}
+            className="touch-pan-y overscroll-x-none flex min-h-0 flex-1 flex-col pb-14 pt-[max(0.75rem,env(safe-area-inset-top))] sm:pb-16 sm:pt-0"
           >
             <BookPageTurn
               step={step}
@@ -144,8 +152,8 @@ export function InviteStepper() {
           <PageTurnIndicator
             step={step}
             totalSteps={TOTAL_STEPS}
-            onPrevious={() => goToStep(Math.max(step - 1, 0))}
-            onNext={() => goToStep(Math.min(step + 1, TOTAL_STEPS - 1))}
+            onPrevious={() => navigateToStep(Math.max(step - 1, 0))}
+            onNext={() => navigateToStep(Math.min(step + 1, TOTAL_STEPS - 1))}
             disabled={isAnimating}
           />
         </PaperCard>

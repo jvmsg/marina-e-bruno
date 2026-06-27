@@ -6,6 +6,7 @@ interface UseSwipeNavigationOptions {
   onSwipeLeft?: () => void;
   onSwipeRight?: () => void;
   threshold?: number;
+  edgeMargin?: number;
   enabled?: boolean;
 }
 
@@ -13,9 +14,14 @@ export function useSwipeNavigation({
   onSwipeLeft,
   onSwipeRight,
   threshold = 56,
+  edgeMargin = 32,
   enabled = true,
 }: UseSwipeNavigationOptions) {
-  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const touchStart = useRef<{
+    x: number;
+    y: number;
+    startedAtLeftEdge: boolean;
+  } | null>(null);
 
   function onTouchStart(event: React.TouchEvent) {
     if (!enabled) {
@@ -23,7 +29,11 @@ export function useSwipeNavigation({
     }
 
     const touch = event.touches[0];
-    touchStart.current = { x: touch.clientX, y: touch.clientY };
+    touchStart.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      startedAtLeftEdge: touch.clientX <= edgeMargin,
+    };
   }
 
   function onTouchEnd(event: React.TouchEvent) {
@@ -34,6 +44,7 @@ export function useSwipeNavigation({
     const touch = event.changedTouches[0];
     const deltaX = touch.clientX - touchStart.current.x;
     const deltaY = touch.clientY - touchStart.current.y;
+    const startedAtLeftEdge = touchStart.current.startedAtLeftEdge;
 
     touchStart.current = null;
 
@@ -43,6 +54,10 @@ export function useSwipeNavigation({
 
     if (deltaX < 0) {
       onSwipeLeft?.();
+      return;
+    }
+
+    if (startedAtLeftEdge) {
       return;
     }
 

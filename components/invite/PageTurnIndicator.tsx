@@ -25,7 +25,7 @@ function FoldCorner({
       disabled={disabled}
       aria-label={label}
       className={cn(
-        "group absolute bottom-[max(0px,env(safe-area-inset-bottom))] z-30 h-[4.25rem] w-[4.25rem] touch-manipulation",
+        "group absolute bottom-[max(0px,env(safe-area-inset-bottom))] z-50 h-[4.25rem] w-[4.25rem] touch-manipulation",
         "transition-opacity disabled:pointer-events-none disabled:opacity-35",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         isRight ? "right-0" : "left-0",
