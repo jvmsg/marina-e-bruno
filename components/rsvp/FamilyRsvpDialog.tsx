@@ -3,11 +3,11 @@
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
+import { weddingContent } from "@/lib/content";
 import type { Guest, GuestLookupResponse, RsvpGuestUpdate } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { dialogContent } from "@/lib/motion/variants";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,7 +16,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { WeddingButton } from "@/components/wedding/wedding-button";
 
 interface FamilyRsvpDialogProps {
@@ -30,7 +29,6 @@ interface FamilyRsvpDialogProps {
 
 type GuestFormState = {
   status: "attending" | "declined";
-  dietaryNotes: string;
 };
 
 function guestAccent(gender: Guest["gender"]) {
@@ -62,7 +60,6 @@ export function FamilyRsvpDialog({
       accumulator[guest.id] = {
         status:
           guest.rsvp_status === "declined" ? "declined" : "attending",
-        dietaryNotes: guest.dietary_notes ?? "",
       };
       return accumulator;
     }, {});
@@ -77,7 +74,6 @@ export function FamilyRsvpDialog({
     const payload: RsvpGuestUpdate[] = guests.map((guest) => ({
       guestId: guest.id,
       status: formState[guest.id]?.status ?? "attending",
-      dietaryNotes: formState[guest.id]?.dietaryNotes,
     }));
 
     try {
@@ -119,14 +115,9 @@ export function FamilyRsvpDialog({
           variants={dialogContent}
         >
           <DialogHeader className="mb-5 text-left">
-            <Badge variant="secondary" className="mb-2 w-fit uppercase tracking-[0.2em]">
-              Confirmação da família
-            </Badge>
-            <DialogTitle className="font-serif text-2xl text-foreground sm:text-3xl">
-              {family.display_name ?? "Seu convite"}
-            </DialogTitle>
-            <DialogDescription>
-              Confirme quem estará presente na celebração.
+            <DialogTitle className="sr-only">Confirmação de presença</DialogTitle>
+            <DialogDescription className="text-base leading-relaxed text-foreground/85">
+              {weddingContent.messages.rsvpDialogIntro}
             </DialogDescription>
           </DialogHeader>
 
@@ -177,24 +168,6 @@ export function FamilyRsvpDialog({
                       Não vai
                     </Button>
                   </div>
-
-                  {state?.status === "attending" && (
-                    <Input
-                      type="text"
-                      placeholder="Restrições alimentares (opcional)"
-                      value={state.dietaryNotes}
-                      onChange={(event) =>
-                        setFormState((current) => ({
-                          ...current,
-                          [guest.id]: {
-                            ...current[guest.id],
-                            dietaryNotes: event.target.value,
-                          },
-                        }))
-                      }
-                      className="mt-3 h-11 rounded-xl bg-card text-base"
-                    />
-                  )}
                 </div>
               );
             })}

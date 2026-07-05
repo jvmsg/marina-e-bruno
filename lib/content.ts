@@ -36,6 +36,8 @@ export const weddingContent = {
     phoneNotFound:
       "Não encontramos este número. Verifique ou contacte os noivos.",
     rsvpSuccess: "Presença confirmada com sucesso!",
+    rsvpDialogIntro:
+      "Seu convite é válido para as pessoas abaixo. Confirme quem estará presente na celebração.",
     giftsTitle: "Lista de presentes",
     giftsSubtitle:
       "Sua presença é o nosso maior presente. Se desejar, escolha um item abaixo.",
