@@ -1,54 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { loadRsvpSession } from "@/lib/rsvp-session";
+import { useGiftCart } from "@/hooks/use-gift-cart";
 import type { GiftItem } from "@/lib/types";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Card,
   CardContent,
 } from "@/components/ui/card";
 import { GiftCard } from "@/components/gifts/gift-card";
+import { GiftCartBar } from "@/components/gifts/gift-cart-bar";
+import { GiftCartSheet } from "@/components/gifts/gift-cart-sheet";
 
 interface GiftCatalogProps {
   items: GiftItem[];
 }
 
 export function GiftCatalog({ items }: GiftCatalogProps) {
-  const [loadingId, setLoadingId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  async function handleCheckout(item: GiftItem) {
-    setLoadingId(item.id);
-    setError(null);
-
-    const session = loadRsvpSession();
-
-    try {
-      const response = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          giftItemId: item.id,
-          familyId: session?.familyId,
-          guestId: session?.guestId,
-        }),
-      });
-
-      const data = (await response.json()) as { url?: string; error?: string };
-
-      if (!response.ok || !data.url) {
-        setError(data.error ?? "Não foi possível iniciar o pagamento.");
-        return;
-      }
-
-      window.location.href = data.url;
-    } catch {
-      setError("Não foi possível iniciar o pagamento. Tente novamente.");
-    } finally {
-      setLoadingId(null);
-    }
-  }
+  const [cartOpen, setCartOpen] = useState(false);
+  const {
+    lines,
+    itemCount,
+    totalCents,
+    hasItems,
+    getQuantity,
+    addItem,
+    removeItem,
+  } = useGiftCart(items);
 
   if (items.length === 0) {
     return (
@@ -63,21 +40,34 @@ export function GiftCatalog({ items }: GiftCatalogProps) {
   }
 
   return (
-    <div className="space-y-4">
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+    <>
+      <div className={hasItems ? "space-y-4 pb-28" : "space-y-4"}>
+        {items.map((item) => (
+          <GiftCard
+            key={item.id}
+            item={item}
+            quantity={getQuantity(item.id)}
+            onAdd={() => addItem(item.id)}
+            onRemove={() => removeItem(item.id)}
+          />
+        ))}
+      </div>
 
-      {items.map((item) => (
-        <GiftCard
-          key={item.id}
-          item={item}
-          loading={loadingId === item.id}
-          onCheckout={handleCheckout}
-        />
-      ))}
-    </div>
+      <GiftCartBar
+        itemCount={itemCount}
+        totalCents={totalCents}
+        onOpenCart={() => setCartOpen(true)}
+      />
+
+      <GiftCartSheet
+        open={cartOpen}
+        onOpenChange={setCartOpen}
+        lines={lines}
+        catalog={items}
+        totalCents={totalCents}
+        onAdd={addItem}
+        onRemove={removeItem}
+      />
+    </>
   );
 }

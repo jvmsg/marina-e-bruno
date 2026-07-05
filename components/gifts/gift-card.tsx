@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import type { GiftItem } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -16,11 +17,12 @@ import { WeddingButton } from "@/components/wedding/wedding-button";
 
 interface GiftCardProps {
   item: GiftItem;
-  loading: boolean;
-  onCheckout: (item: GiftItem) => void;
+  quantity: number;
+  onAdd: () => void;
+  onRemove: () => void;
 }
 
-export function GiftCard({ item, loading, onCheckout }: GiftCardProps) {
+export function GiftCard({ item, quantity, onAdd, onRemove }: GiftCardProps) {
   return (
     <motion.article
       whileHover={{ y: -2 }}
@@ -52,14 +54,37 @@ export function GiftCard({ item, loading, onCheckout }: GiftCardProps) {
         </CardContent>
 
         <CardFooter className="pb-5">
-          <WeddingButton
-            type="button"
-            onClick={() => onCheckout(item)}
-            disabled={loading}
-            className="w-full"
-          >
-            {loading ? "Redirecionando..." : "Presentear"}
-          </WeddingButton>
+          {quantity === 0 ? (
+            <WeddingButton type="button" onClick={onAdd} className="w-full">
+              Adicionar
+            </WeddingButton>
+          ) : (
+            <div className="flex w-full items-center justify-between gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="touch-target size-11 rounded-full sm:size-9"
+                onClick={onRemove}
+                aria-label={`Remover um ${item.name}`}
+              >
+                −
+              </Button>
+              <span className="min-w-8 text-center text-base font-medium">
+                {quantity}
+              </span>
+              <Button
+                type="button"
+                variant="default"
+                size="icon"
+                className="touch-target size-11 rounded-full sm:size-9"
+                onClick={onAdd}
+                aria-label={`Adicionar um ${item.name}`}
+              >
+                +
+              </Button>
+            </div>
+          )}
         </CardFooter>
       </Card>
     </motion.article>

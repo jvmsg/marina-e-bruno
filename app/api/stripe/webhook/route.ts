@@ -2,6 +2,23 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/server";
+import type { GiftOrderStatus } from "@/lib/types";
+
+async function updateOrderBySessionId(
+  sessionId: string,
+  status: GiftOrderStatus,
+) {
+  const supabase = createServiceClient();
+
+  const { error } = await supabase
+    .from("gift_orders")
+    .update({ status })
+    .eq("stripe_checkout_session_id", sessionId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
 
 export async function POST(request: Request) {
   const stripe = getStripe();
@@ -23,28 +40,32 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const supabase = createServiceClient();
+  try {
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as Stripe.Checkout.Session;
 
-    const { error } = await supabase
-      .from("gift_orders")
-      .update({ status: "paid" })
-      .eq("stripe_checkout_session_id", session.id);
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      if (session.payment_status === "paid") {
+        await updateOrderBySessionId(session.id, "paid");
+      }
     }
-  }
 
-  if (event.type === "checkout.session.expired") {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const supabase = createServiceClient();
+    if (event.type === "checkout.session.async_payment_succeeded") {
+      const session = event.data.object as Stripe.Checkout.Session;
+      await updateOrderBySessionId(session.id, "paid");
+    }
 
-    await supabase
-      .from("gift_orders")
-      .update({ status: "failed" })
-      .eq("stripe_checkout_session_id", session.id);
+    if (event.type === "checkout.session.async_payment_failed") {
+      const session = event.data.object as Stripe.Checkout.Session;
+      await updateOrderBySessionId(session.id, "failed");
+    }
+
+    if (event.type === "checkout.session.expired") {
+      const session = event.data.object as Stripe.Checkout.Session;
+      await updateOrderBySessionId(session.id, "failed");
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Erro ao processar webhook.";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });

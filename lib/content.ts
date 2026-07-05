@@ -41,5 +41,27 @@ export const weddingContent = {
     giftsTitle: "Lista de presentes",
     giftsSubtitle:
       "Sua presença é o nosso maior presente. Se desejar, escolha um item abaixo.",
+    cartBarCta: "Ver carrinho",
+    cartSheetTitle: "Seu carrinho",
+    cartEmpty: "Seu carrinho está vazio.",
+    cartTotal: "Total",
+    cartPay: "Pagar",
+    cartPaying: "Redirecionando...",
+    cartPaymentCard: "Cartão de crédito",
+    cartPaymentPix: "Pix",
+    cartPixCta: "Gerar código Pix",
+    cartCheckoutError: "Não foi possível iniciar o pagamento. Tente novamente.",
+    pixEyebrow: "Pagamento",
+    pixTitle: "Pague com Pix",
+    pixDescription:
+      "Copie o código abaixo e cole no app do seu banco. O valor já está incluído no código.",
+    pixCodeLabel: "Pix copia e cola",
+    pixCopyCta: "Copiar código Pix",
+    pixCopied: "Código copiado!",
+    pixCopyError: "Não foi possível copiar automaticamente. Selecione e copie o código manualmente.",
+    pixConfirmCta: "Já realizei o pagamento",
+    pixInvalidLink: "Não encontramos os dados do Pix. Volte ao carrinho e tente novamente.",
+    pixSuccessDescription:
+      "Obrigado pelo carinho! Assim que o Pix for identificado, seu presente será confirmado.",
   },
 } as const;
