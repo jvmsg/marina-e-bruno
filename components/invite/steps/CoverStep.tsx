@@ -1,5 +1,6 @@
 import { weddingContent } from "@/lib/content";
 import { Separator } from "@/components/ui/separator";
+import { StorageImage } from "@/components/ui/StorageImage";
 import {
   StaggerChildren,
   StaggerItem,
@@ -20,6 +21,16 @@ export function CoverStep() {
         <h1 className="font-serif text-[clamp(1.85rem,8vw,3rem)] leading-tight text-foreground">
           {weddingContent.couple.fullNames}
         </h1>
+      </StaggerItem>
+      <StaggerItem className="w-full">
+        <div className="relative mx-auto mt-5 aspect-[4/5] w-full max-w-[240px] overflow-hidden rounded-2xl sm:max-w-[280px]">
+          <StorageImage
+            path={weddingContent.photos.hero}
+            alt={`${weddingContent.couple.fullNames} — convite`}
+            fill
+            priority
+          />
+        </div>
       </StaggerItem>
       <StaggerItem className="w-full">
         <Separator className="mx-auto mt-5 w-16 bg-border" />
