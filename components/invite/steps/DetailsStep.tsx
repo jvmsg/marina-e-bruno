@@ -1,4 +1,5 @@
 import { weddingContent } from "@/lib/content";
+import { DressIcon, SuitIcon } from "@/components/invite/dress-code-icons";
 import { LocationCard } from "@/components/invite/location-card";
 import { InviteHeading } from "@/components/wedding/invite-heading";
 import {
@@ -32,10 +33,24 @@ export function DetailsStep() {
 
       <StaggerItem>
         <div className="rounded-2xl bg-muted p-5">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          <p className="text-center text-xs uppercase tracking-[0.2em] text-muted-foreground">
             Dress code
           </p>
-          <p className="mt-1 text-foreground">{weddingContent.dressCode}</p>
+          <div className="mt-4 flex items-center justify-center gap-4">
+            <div
+              className="flex size-14 shrink-0 items-center justify-center rounded-full border border-border bg-background text-accent"
+              aria-hidden
+            >
+              <DressIcon />
+            </div>
+            <p className="text-center text-foreground">{weddingContent.dressCode}</p>
+            <div
+              className="flex size-14 shrink-0 items-center justify-center rounded-full border border-border bg-background text-accent"
+              aria-hidden
+            >
+              <SuitIcon />
+            </div>
+          </div>
         </div>
       </StaggerItem>
     </StaggerChildren>
