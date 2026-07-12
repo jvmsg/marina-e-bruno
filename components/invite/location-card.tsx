@@ -12,6 +12,30 @@ type LocationCardProps = {
 export function LocationCard({ location }: LocationCardProps) {
   return (
     <div className="space-y-4 rounded-2xl border border-border bg-muted p-4 sm:p-5">
+      
+      {location.schedule.length > 0 && (
+        <ol className="space-y-3 pt-1">
+          {location.schedule.map((item) => (
+            <li
+              key={`${item.time}-${item.title}`}
+              className="rounded-xl border border-border bg-background/60 p-3"
+            >
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-4">
+                <span className="font-serif text-lg text-accent sm:min-w-14 sm:text-xl">
+                  {item.time}
+                </span>
+                <div>
+                  <h3 className="font-medium text-foreground">{item.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
+      
       <div className="relative aspect-[16/10] overflow-hidden rounded-2xl">
         <StorageImage
           path={location.image}
@@ -40,28 +64,6 @@ export function LocationCard({ location }: LocationCardProps) {
         Ver no mapa
       </WeddingButton>
 
-      {location.schedule.length > 0 && (
-        <ol className="space-y-3 pt-1">
-          {location.schedule.map((item) => (
-            <li
-              key={`${item.time}-${item.title}`}
-              className="rounded-xl border border-border bg-background/60 p-3"
-            >
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-4">
-                <span className="font-serif text-lg text-accent sm:min-w-14 sm:text-xl">
-                  {item.time}
-                </span>
-                <div>
-                  <h3 className="font-medium text-foreground">{item.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {item.description}
-                  </p>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ol>
-      )}
     </div>
   );
 }
