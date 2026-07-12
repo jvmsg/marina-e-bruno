@@ -88,13 +88,13 @@ export function InviteStepper() {
       switch (currentStep) {
         case 0:
           return <CoverStep />;
+        // case 1:
+        //   return <StoryStep />;
         case 1:
-          return <StoryStep />;
-        case 2:
           return <DetailsStep />;
-        case 3:
+        case 2:
           return <ScheduleStep />;
-        case 4:
+        case 3:
           return (
             <ConfirmationStep
               phone={phone}
