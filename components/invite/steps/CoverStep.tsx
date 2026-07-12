@@ -23,7 +23,7 @@ export function CoverStep() {
         </h1>
       </StaggerItem>
       <StaggerItem className="w-full">
-        <div className="relative mx-auto mt-5 aspect-[4/5] w-full max-w-[240px] overflow-hidden rounded-2xl sm:max-w-[280px]">
+        <div className="relative mx-auto mt-5 aspect-[4/5] w-full max-w-[min(92vw,20rem)] overflow-hidden rounded-2xl sm:max-w-[min(88%,24rem)]">
           <StorageImage
             path={weddingContent.photos.hero}
             alt={`${weddingContent.couple.fullNames} — convite`}

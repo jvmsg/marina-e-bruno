@@ -10,7 +10,7 @@ export const weddingContent = {
     time: "16h00",
   },
   venue: {
-    name: "Moara",
+    name: "Igreja Sagrado Coração de Jesus - Moara",
     address: "km 12, Rod. Floriano Rodrigues Pinheiro - Jardim Maracaibo, Tremembé",
     mapUrl: "https://www.google.com/maps?vet=10CAAQoqAOahcKEwi4o9fQ-cuVAxUAAAAAHQAAAAAQCA..i&pvq=Cg0vZy8xMWM2ejEza3gwIgsKBW1vYXJhEAIYAw&lqi=CgVtb2FyYUiAj8fgm6uAgAhaDxAAGAAiBW1vYXJhMgJwdJIBDndlZGRpbmdfYnVmZmV0&fvr=1&cs=1&um=1&ie=UTF-8&fb=1&gl=br&sa=X&ftid=0x94cc58e412af2303:0x94b769704091654c",
   },
@@ -23,7 +23,7 @@ export const weddingContent = {
     ],
   },
   schedule: [
-    { time: "16h00", title: "Cerimônia", description: "Celebraremos nossa união na Igreja Sagrado coracao Jesus." },
+    { time: "16h00", title: "Cerimônia", description: "Celebraremos nossa união na Igreja Sagrado Coração de Jesus." },
     { time: "21h00", title: "Jantar e festa", description: "Música, dança e muita alegria." },
   ],
   photos: {
