@@ -10,16 +10,14 @@ import type { Guest, GuestLookupResponse } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { BookPageTurn } from "@/components/motion/book-page-turn";
 import { CoverStep } from "@/components/invite/steps/CoverStep";
-import { StoryStep } from "@/components/invite/steps/StoryStep";
 import { DetailsStep } from "@/components/invite/steps/DetailsStep";
-import { ScheduleStep } from "@/components/invite/steps/ScheduleStep";
 import { ConfirmationStep } from "@/components/invite/steps/ConfirmationStep";
 import { FamilyRsvpDialog } from "@/components/rsvp/FamilyRsvpDialog";
 import { PageTurnIndicator } from "@/components/invite/PageTurnIndicator";
 import { MobileShell } from "@/components/wedding/mobile-shell";
 import { PaperCard } from "@/components/wedding/paper-card";
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 3;
 
 export function InviteStepper() {
   const [step, setStep] = useState(0);
@@ -93,8 +91,6 @@ export function InviteStepper() {
         case 1:
           return <DetailsStep />;
         case 2:
-          return <ScheduleStep />;
-        case 3:
           return (
             <ConfirmationStep
               phone={phone}

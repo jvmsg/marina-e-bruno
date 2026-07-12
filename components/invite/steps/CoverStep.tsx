@@ -42,7 +42,7 @@ export function CoverStep() {
       </StaggerItem>
       <StaggerItem>
         <p className="mt-2 text-sm text-muted-foreground">
-          {weddingContent.venue.name}
+          {weddingContent.cover.subtitle}
         </p>
       </StaggerItem>
     </StaggerChildren>
