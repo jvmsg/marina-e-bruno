@@ -5,14 +5,14 @@ export const weddingContent = {
     fullNames: "Marina & Bruno",
   },
   date: {
-    display: "15 de novembro de 2026",
+    display: "26 de setembro de 2026",
     weekday: "Sábado",
     time: "16h00",
   },
   venue: {
-    name: "Espaço Jardim das Acácias",
-    address: "Rua das Flores, 123 — São Paulo, SP",
-    mapUrl: "https://maps.google.com",
+    name: "Moara",
+    address: "km 12, Rod. Floriano Rodrigues Pinheiro - Jardim Maracaibo, Tremembé",
+    mapUrl: "https://www.google.com/maps?vet=10CAAQoqAOahcKEwi4o9fQ-cuVAxUAAAAAHQAAAAAQCA..i&pvq=Cg0vZy8xMWM2ejEza3gwIgsKBW1vYXJhEAIYAw&lqi=CgVtb2FyYUiAj8fgm6uAgAhaDxAAGAAiBW1vYXJhMgJwdJIBDndlZGRpbmdfYnVmZmV0&fvr=1&cs=1&um=1&ie=UTF-8&fb=1&gl=br&sa=X&ftid=0x94cc58e412af2303:0x94b769704091654c",
   },
   dressCode: "Traje social elegante",
   story: {
@@ -23,10 +23,8 @@ export const weddingContent = {
     ],
   },
   schedule: [
-    { time: "15h30", title: "Recepção dos convidados", description: "Boas-vindas no jardim." },
-    { time: "16h00", title: "Cerimônia", description: "Celebraremos nossa união ao ar livre." },
-    { time: "17h00", title: "Coquetel", description: "Brindes, fotos e aperitivos." },
-    { time: "19h00", title: "Jantar e festa", description: "Música, dança e muita alegria." },
+    { time: "16h00", title: "Cerimônia", description: "Celebraremos nossa união na Igreja Sagrado coracao Jesus." },
+    { time: "21h00", title: "Jantar e festa", description: "Música, dança e muita alegria." },
   ],
   photos: {
     hero: "gallery/Bruno & Marina - Pre Wedding-110.jpg",
