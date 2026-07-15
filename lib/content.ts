@@ -7,7 +7,7 @@ export const weddingContent = {
   date: {
     display: "26 de setembro de 2026",
     weekday: "Sábado",
-    time: "16h00",
+    time: "18h30",
   },
   cover: {
     subtitle: "Moara",
@@ -23,7 +23,7 @@ export const weddingContent = {
       image: "gallery/igreja.webp",
       schedule: [
         {
-          time: "16h00",
+          time: "18h30",
           title: "Cerimônia",
           description:
             "Celebraremos nossa união na Igreja Sagrado Coração de Jesus.",

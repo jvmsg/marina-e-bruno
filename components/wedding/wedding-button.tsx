@@ -6,12 +6,16 @@ export function WeddingButton({
   className,
   variant = "default",
   size = "lg",
+  nativeButton,
+  render,
   ...props
 }: ComponentProps<typeof Button>) {
   return (
     <Button
       variant={variant}
       size={size}
+      render={render}
+      nativeButton={nativeButton ?? (render ? false : undefined)}
       className={cn(
         "touch-target min-h-11 rounded-full px-5 text-base sm:min-h-9 sm:text-sm",
         className,

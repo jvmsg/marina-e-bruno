@@ -57,7 +57,6 @@ export function LocationCard({ location }: LocationCardProps) {
         variant="outline"
         size="default"
         className="w-full sm:w-auto"
-        nativeButton={false}
         render={
           <a href={location.mapUrl} target="_blank" rel="noopener noreferrer" />
         }
