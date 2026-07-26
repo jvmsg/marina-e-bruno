@@ -33,11 +33,41 @@ export interface InfinitePayPaymentCheckResult {
 const LINKS_URL = "https://api.checkout.infinitepay.io/links";
 const PAYMENT_CHECK_URL = "https://api.checkout.infinitepay.io/payment_check";
 
-export function getInfinitePayConfig(): InfinitePayConfig {
+function normalizeSiteUrl(value: string): string {
+  return value.trim().replace(/\/$/, "");
+}
+
+export function resolveSiteUrl(request?: Request): string {
+  const origin = request?.headers.get("origin")?.trim();
+  if (origin) {
+    return normalizeSiteUrl(origin);
+  }
+
+  const forwardedHost = request?.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const forwardedProto = request?.headers
+    .get("x-forwarded-proto")
+    ?.split(",")[0]
+    ?.trim();
+  const host = forwardedHost || request?.headers.get("host")?.trim();
+
+  if (host) {
+    const proto =
+      forwardedProto ||
+      (host.includes("localhost") || host.startsWith("127.") ? "http" : "https");
+    return normalizeSiteUrl(`${proto}://${host}`);
+  }
+
+  const envUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (envUrl) {
+    return normalizeSiteUrl(envUrl);
+  }
+
+  return "http://localhost:3000";
+}
+
+export function getInfinitePayConfig(request?: Request): InfinitePayConfig {
   const handle = process.env.INFINITEPAY_HANDLE?.trim().replace(/^\$/, "");
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000")
-    .trim()
-    .replace(/\/$/, "");
+  const siteUrl = resolveSiteUrl(request);
 
   if (!handle) {
     throw new Error(
@@ -65,9 +95,18 @@ export function mapCaptureMethod(
 export async function createCheckoutLink(options: {
   orderNsu: string;
   items: InfinitePayCheckoutItem[];
+  request?: Request;
   config?: InfinitePayConfig;
 }): Promise<string> {
-  const config = options.config ?? getInfinitePayConfig();
+  const config = options.config ?? getInfinitePayConfig(options.request);
+
+  // Webhook must be publicly reachable. Prefer NEXT_PUBLIC_SITE_URL when set to a
+  // non-localhost URL; otherwise fall back to the same origin used for redirect.
+  const envSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  const webhookBase =
+    envSiteUrl && !/localhost|127\.0\.0\.1/i.test(envSiteUrl)
+      ? normalizeSiteUrl(envSiteUrl)
+      : config.siteUrl;
 
   const response = await fetch(LINKS_URL, {
     method: "POST",
@@ -76,7 +115,7 @@ export async function createCheckoutLink(options: {
       handle: config.handle,
       order_nsu: options.orderNsu,
       redirect_url: `${config.siteUrl}/gifts/success`,
-      webhook_url: `${config.siteUrl}/api/infinitepay/webhook`,
+      webhook_url: `${webhookBase}/api/infinitepay/webhook`,
       items: options.items,
     }),
   });

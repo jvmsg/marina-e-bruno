@@ -26,6 +26,7 @@ export async function POST(request: Request) {
 
     const url = await createCheckoutLink({
       orderNsu: order.id,
+      request,
       items: lineItems.map((line) => ({
         quantity: line.quantity,
         price: line.giftItem.price_cents,
