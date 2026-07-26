@@ -4,17 +4,25 @@ import type { GiftItem } from "@/lib/types";
 import { GiftCatalog } from "@/components/gifts/GiftCatalog";
 import { GiftsIntro } from "@/components/gifts/gifts-intro";
 
+export const dynamic = "force-dynamic";
+
 async function getGiftItems(): Promise<GiftItem[]> {
   try {
     const supabase = createServiceClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("gift_items")
       .select("*")
       .eq("active", true)
       .order("sort_order", { ascending: true });
 
+    if (error) {
+      console.error("Failed to load gift_items:", error.message);
+      return [];
+    }
+
     return (data ?? []) as GiftItem[];
-  } catch {
+  } catch (error) {
+    console.error("Failed to load gift_items:", error);
     return [];
   }
 }
