@@ -26,7 +26,7 @@ export interface GiftItem {
   name: string;
   description: string;
   price_cents: number;
-  stripe_price_id: string;
+  stripe_price_id: string | null;
   image_path: string | null;
   active: boolean;
   sort_order: number;
@@ -41,10 +41,12 @@ export interface GiftOrder {
   id: string;
   family_id: string | null;
   guest_id: string | null;
-  stripe_checkout_session_id: string;
+  provider_reference: string | null;
   amount_cents: number;
-  payment_method: PaymentMethod;
+  payment_method: PaymentMethod | null;
   status: GiftOrderStatus;
+  transaction_nsu: string | null;
+  receipt_url: string | null;
   created_at: string;
 }
 

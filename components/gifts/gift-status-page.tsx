@@ -12,6 +12,7 @@ interface GiftStatusAction {
   href: string;
   label: string;
   variant?: "default" | "outline" | "accent";
+  external?: boolean;
 }
 
 interface GiftStatusPageProps {
@@ -44,7 +45,17 @@ export function GiftStatusPage({
                 <WeddingButton
                   key={action.href + action.label}
                   variant={action.variant ?? "default"}
-                  render={<Link href={action.href} />}
+                  render={
+                    action.external ? (
+                      <a
+                        href={action.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      />
+                    ) : (
+                      <Link href={action.href} />
+                    )
+                  }
                 >
                   {action.label}
                 </WeddingButton>

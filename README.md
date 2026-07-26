@@ -1,12 +1,12 @@
 # Site de Casamento
 
-Site mobile-first para convite de casamento, confirmação de presença por família e lista de presentes com Stripe.
+Site mobile-first para convite de casamento, confirmação de presença por família e lista de presentes com InfinitePay.
 
 ## Stack
 
 - Next.js (App Router)
 - Supabase (dados, storage e RLS)
-- Stripe Checkout
+- InfinitePay Checkout Integrado (Pix e cartão)
 - Deploy na Vercel
 
 ## Desenvolvimento local
@@ -23,9 +23,9 @@ npm install
 cp .env.example .env.local
 ```
 
-3. Preencha `.env.local` com as chaves do Supabase e Stripe.
+3. Preencha `.env.local` com as chaves do Supabase e o `INFINITEPAY_HANDLE` (InfiniteTag, sem `$`).
 
-4. Execute o SQL em [`supabase/migrations/001_initial.sql`](supabase/migrations/001_initial.sql) no Supabase Dashboard (SQL Editor).
+4. Execute as migrations em [`supabase/migrations/`](supabase/migrations/) no Supabase Dashboard (SQL Editor), na ordem.
 
 5. Inicie o projeto:
 
@@ -39,11 +39,13 @@ Abra [http://localhost:3000](http://localhost:3000).
 
 ### Tabelas
 
-Após rodar a migration, cadastre manualmente:
+Após rodar as migrations, cadastre manualmente:
 
 1. **`families`**: uma linha por família/convite
 2. **`guests`**: convidados ligados ao mesmo `family_id`
-3. **`gift_items`**: presentes com `stripe_price_id` e `price_cents`
+3. **`gift_items`**: presentes com `name`, `price_cents` e opcionalmente `image_path`
+
+Ou use [`supabase/seed_guests.sql`](supabase/seed_guests.sql) para a lista de convidados.
 
 ### Telefones
 
@@ -57,30 +59,30 @@ Salve telefones normalizados, preferencialmente no formato `55DDDNUMERO` (ex.: `
    - `gallery/photo-1.jpg`
    - `gallery/photo-2.jpg`
    - `gifts/...`
+   - `locations/ceremony.jpg`
+   - `locations/party.jpg`
 3. Atualize os caminhos em [`lib/content.ts`](lib/content.ts) e `gift_items.image_path`
 
-## Configuração do Stripe
+## Configuração do InfinitePay
 
-1. Crie produtos e preços no Stripe (modo teste)
-2. Copie o `price_...` para `gift_items.stripe_price_id`
-3. Configure webhook apontando para:
+1. No app InfinitePay (ou [web](https://app.infinitepay.io/external-checkout#configuracoes)), habilite o **Checkout Integrado**
+2. Copie sua InfiniteTag (handle) **sem** o `$` inicial para `INFINITEPAY_HANDLE`
+3. O webhook é enviado automaticamente para:
 
 ```text
-https://SEU-DOMINIO/api/stripe/webhook
+https://SEU-DOMINIO/api/infinitepay/webhook
 ```
 
-Eventos recomendados:
+(definido em cada link criado via API)
 
-- `checkout.session.completed`
-- `checkout.session.expired`
+4. O convidado escolhe Pix ou cartão na página hospedada da InfinitePay
 
 ## Deploy na Vercel
 
 1. Envie o repositório para o GitHub
 2. Importe o projeto na Vercel
 3. Configure as mesmas variáveis de `.env.example`
-4. Atualize `NEXT_PUBLIC_SITE_URL` para a URL de produção
-5. Atualize o webhook do Stripe com a URL final
+4. Atualize `NEXT_PUBLIC_SITE_URL` para a URL de produção (ex.: `https://marina-e-bruno.vercel.app`)
 
 ## Conteúdo do site
 
@@ -88,11 +90,11 @@ Edite textos, nomes, data e caminhos de fotos em [`lib/content.ts`](lib/content.
 
 ## Fluxo do convidado
 
-1. Percorre o convite em etapas (capa, história, detalhes, programação)
+1. Percorre o convite (capa → detalhes → confirmação)
 2. Informa o telefone
 3. Confirma presença de cada membro da família
 4. É redirecionado para `/gifts`
-5. Escolhe um presente e paga via Stripe Checkout
+5. Monta o carrinho e paga via InfinitePay (Pix ou cartão)
 
 ## Cores
 

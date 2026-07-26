@@ -77,20 +77,22 @@ export async function createGiftOrder(
   options: {
     familyId?: string;
     guestId?: string;
-    paymentMethod: "card" | "pix";
     totalCents: number;
-    sessionReference: string;
     lineItems: ResolvedCartLine[];
+    orderId?: string;
   },
 ) {
+  const orderId = options.orderId ?? crypto.randomUUID();
+
   const { data: order, error: orderError } = await supabase
     .from("gift_orders")
     .insert({
+      id: orderId,
       family_id: options.familyId || null,
       guest_id: options.guestId || null,
-      stripe_checkout_session_id: options.sessionReference,
+      provider_reference: orderId,
       amount_cents: options.totalCents,
-      payment_method: options.paymentMethod,
+      payment_method: null,
       status: "pending",
     })
     .select("id")

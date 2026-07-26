@@ -271,9 +271,7 @@ out.push(`-- delete from public.guests;`);
 out.push(`-- delete from public.families;`);
 out.push(``);
 
-let familyIndex = 0;
 for (const family of families) {
-  familyIndex += 1;
   out.push(`-- Family: ${family.display_name}`);
   out.push(`with inserted as (`);
   out.push(

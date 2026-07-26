@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { weddingContent } from "@/lib/content";
 import { loadRsvpSession } from "@/lib/rsvp-session";
-import type { GiftCartLine, GiftItem, PaymentMethod } from "@/lib/types";
-import { formatCurrency, cn } from "@/lib/utils";
+import type { GiftCartLine, GiftItem } from "@/lib/types";
+import { formatCurrency } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +14,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { WeddingButton } from "@/components/wedding/wedding-button";
 
 interface GiftCartSheetProps {
@@ -37,8 +35,6 @@ export function GiftCartSheet({
   onAdd,
   onRemove,
 }: GiftCartSheetProps) {
-  const router = useRouter();
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -78,44 +74,20 @@ export function GiftCartSheet({
     };
 
     try {
-      if (paymentMethod === "card") {
-        const response = await fetch("/api/stripe/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        const data = (await response.json()) as { url?: string; error?: string };
-
-        if (!response.ok || !data.url) {
-          setError(data.error ?? weddingContent.messages.cartCheckoutError);
-          return;
-        }
-
-        window.location.href = data.url;
-        return;
-      }
-
-      const response = await fetch("/api/gifts/pix", {
+      const response = await fetch("/api/infinitepay/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      const data = (await response.json()) as {
-        orderId?: string;
-        pixCode?: string;
-        amountCents?: number;
-        error?: string;
-      };
+      const data = (await response.json()) as { url?: string; error?: string };
 
-      if (!response.ok || !data.orderId || !data.pixCode) {
+      if (!response.ok || !data.url) {
         setError(data.error ?? weddingContent.messages.cartCheckoutError);
         return;
       }
 
-      onOpenChange(false);
-      router.push(`/gifts/pix?order=${data.orderId}`);
+      window.location.href = data.url;
     } catch {
       setError(weddingContent.messages.cartCheckoutError);
     } finally {
@@ -134,7 +106,7 @@ export function GiftCartSheet({
             {weddingContent.messages.cartSheetTitle}
           </DialogTitle>
           <DialogDescription className="sr-only">
-            Revise os presentes selecionados e escolha a forma de pagamento.
+            Revise os presentes selecionados e finalize o pagamento.
           </DialogDescription>
         </DialogHeader>
 
@@ -191,42 +163,6 @@ export function GiftCartSheet({
               </div>
             ))}
 
-            <div className="rounded-2xl border border-border bg-card p-4">
-              <p className="text-sm font-medium text-foreground">
-                Forma de pagamento
-              </p>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod("card")}
-                  className={cn(
-                    "rounded-xl border px-3 py-3 text-sm font-medium transition-colors",
-                    paymentMethod === "card"
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-background text-foreground hover:bg-muted",
-                  )}
-                >
-                  <Label className="pointer-events-none">
-                    {weddingContent.messages.cartPaymentCard}
-                  </Label>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod("pix")}
-                  className={cn(
-                    "rounded-xl border px-3 py-3 text-sm font-medium transition-colors",
-                    paymentMethod === "pix"
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-background text-foreground hover:bg-muted",
-                  )}
-                >
-                  <Label className="pointer-events-none">
-                    {weddingContent.messages.cartPaymentPix}
-                  </Label>
-                </button>
-              </div>
-            </div>
-
             <div className="flex items-center justify-between rounded-2xl bg-muted px-4 py-3">
               <span className="font-medium text-foreground">
                 {weddingContent.messages.cartTotal}
@@ -251,9 +187,7 @@ export function GiftCartSheet({
             >
               {loading
                 ? weddingContent.messages.cartPaying
-                : paymentMethod === "pix"
-                  ? weddingContent.messages.cartPixCta
-                  : weddingContent.messages.cartPay}
+                : weddingContent.messages.cartPay}
             </WeddingButton>
           </div>
         )}
